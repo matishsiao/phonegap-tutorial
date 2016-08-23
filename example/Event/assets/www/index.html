@@ -1,0 +1,58 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>Event</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	//監聽PhoneGap裝置初始化完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+	//裝置初始化完成
+  function onDeviceReady() {
+	  //顯示目前裝置資訊    			
+		var element = document.getElementById('deviceProperties');
+		element.innerHTML = '裝置名稱: '     + device.name     + '<br />' + 
+		'PhoneGap版本: ' + device.phonegap + '<br />' + 
+		'平台: ' + device.platform + '<br />' + 
+		'裝置UUID: '     + device.uuid     + '<br />' + 
+		'平台版本: '  + device.version  + '<br />';    
+		//監聽當裝置進入背景處理事件
+		document.addEventListener("pause", onPause, false);
+		//監聽當裝置從背景返回前台的處理
+		document.addEventListener("resume", onResume, false);
+		//可連線到網際網路
+		document.addEventListener("online", onOnline, false);
+		//無法連線到網際網路
+		document.addEventListener("offline", onOffline, false);
+		//按下返回鍵
+		document.addEventListener("backbutton", onBackKeyDown, false);		
+		//按下選單鍵
+		document.addEventListener("menubutton", onMenuKeyDown, false);
+		//按下搜尋鍵
+		document.addEventListener("searchbutton", onSearchKeyDown, false);
+  } 
+  //監聽當裝置進入背景處理事件
+  function onPause() { addEventTrace("Pause","程式進入背景處理");   }
+  //監聽當裝置從背景返回前台的處理
+  function onResume() { addEventTrace("Resume","程式從背景處理返回到前台"); }
+  //可連線到網際網路
+  function onOnline() { addEventTrace("Online","可連線到網際網路");}
+  //無法連線到網際網路
+  function onOffline() { addEventTrace("Offline","無法連線到網際網路");}
+  //按下返回鍵
+  function onBackKeyDown() {addEventTrace("Backbutton","使用者按下返回鍵");}
+  //按下選單鍵
+  function onMenuKeyDown() {addEventTrace("Menubutton","使用者按下選單鍵");}
+  //按下搜尋鍵
+  function onSearchKeyDown() {addEventTrace("Searchbutton","使用者按下搜尋鍵");}
+  //顯示追蹤訊息
+  function addEventTrace(eventName,msg){
+  	var element = document.getElementById('eventTraceList');
+  	element.innerHTML += "[" + eventName + "]:" + msg + "<br />";
+  }  
+  </script>
+<body>
+	<p id="deviceProperties">讀取裝置資訊中...</p>
+	<p id="eventTraceList">事件資訊</p>
+</body>
+</html>

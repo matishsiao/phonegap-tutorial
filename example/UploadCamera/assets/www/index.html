@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta charset="utf-8">
+    <title>File Transfer Example</title>
+    <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>    
+    <script type="text/javascript" charset="utf-8">        
+    //監聽裝置初始化事件        
+    document.addEventListener("deviceready", onDeviceReady, false);        
+    //裝置準備完成
+    function onDeviceReady() {       
+    }
+    //顯示相片預覽 
+    function onPhotoURISuccess(imageURI) {      
+	    var largeImage = document.getElementById('largeImage');     
+	    largeImage.style.display = 'block';      
+	    largeImage.src = imageURI;    
+    }     
+    //取得相片
+    function getPhoto() {         
+       navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,
+       destinationType: navigator.camera.DestinationType.FILE_URI,        
+       sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY });    
+    }    
+    //取得相片失敗    
+    function onFail(message) {      
+    	alert('Failed because: ' + message);    
+    }  
+    //上傳圖片(使用DATA URI格式)    
+    function uploadPhoto() {    
+    	 var largeImage = document.getElementById('largeImage');   
+    	var imageURI = largeImage.src;
+	    var options = new FileUploadOptions();            
+	    options.fileKey="image";            
+	    options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);            
+	    options.mimeType="image/jpeg";            
+	    var params = new Object();            
+	    params.value1 = "test";            
+	    params.value2 = "param";            
+	    options.params = params;            
+	    var ft = new FileTransfer();            
+	    ft.upload(imageURI, "http://www.sbiec.com/phonegap/upload.php", uploadSuccess, uploadfail, options);        
+    }        
+    function uploadSuccess(r) {            
+    	console.log("Code = " + r.responseCode);            
+    	console.log("Response = " + r.response);            
+    	console.log("Sent = " + r.bytesSent);        
+    }        
+    function uploadfail(error) {            
+    	alert("An error has occurred: Code = " = error.code);        
+    }
+    //下載圖片
+    function downloadPhoto(){   
+	    var downloadFileTransfer = new FileTransfer();
+	    //設定下鮺網址
+	    var url = "http://phonegap.com/assets/support_sales.jpg";
+	    //設鄧存放路徑
+	    var filePath = "mnt/sdcard/support_sales.jpg";
+	    downloadFileTransfer.download(    
+		    url,    
+		    filePath,    
+		    function(entry) {        
+		      console.log("download complete: " + entry.fullPath);    
+		    },    
+		    function(error) {        
+		      console.log("download error source " + error.source);        
+		      console.log("download error target " + error.target);        
+		      console.log("upload error code" + error.code);    
+		    }
+	    );
+	}
+         
+    </script>
+</head>
+ <body>    
+ 	<button onclick="downloadPhoto();">下載圖片</button>
+  <button onclick="getPhoto();">從相簿取得相片</button>
+  <button onclick="uploadPhoto();">上傳</button><br />   
+  <p>預覽圖</p>
+  <img style="display:none;" id="largeImage" src="" width="<script>window.innerWidth</script>"/>   
+ </body>
+</html>

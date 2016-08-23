@@ -1,0 +1,25 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>DeviceReady</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+		//監聽PhoneGap API初始化事件
+		document.addEventListener("deviceready",onDeviceReady,false);
+		
+  	//當PhoneGap API初始化完成後觸發事件
+    function onDeviceReady() {    	
+		 alert("裝置初始化完成");				
+		 //如果初始化完成後,有需要做後續監聽事件或是開始初始化自己的APP
+     webInit();        
+    } 
+  	//開始自己的APP初始化
+		function webInit(){
+			
+		}	
+</script>
+<body>
+ <p>PhoneGap API函式庫初始化測試</p>
+</body>
+</html>

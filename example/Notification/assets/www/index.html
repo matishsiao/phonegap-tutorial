@@ -1,0 +1,57 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>Connection</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	//監聽PhoneGap裝置初始化完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+	//裝置初始化完成
+  function onDeviceReady() {    					
+  } 
+	//顯示通知
+	function showAlert() {       
+	 	 navigator.notification.alert(            
+	 	 'You are the winner!',  // 訊息             
+	 	 alertDismissed,         // 呼叫函式            
+	 	 'Game Over',            // 標題            
+	 	 'Done'                  // 按鈕名稱        
+	 	 );    
+	}
+	//使用者點擊關閉訊息
+	function alertDismissed() {        
+		console.log("alertDismissed");
+	}
+	//使用者點擊確認訊息
+	function onConfirm(button) {    
+		//button 為int,1=ok,2=cancel
+		alert('You selected button ' + button);
+	}
+	//顯示確認通知
+	function showConfirm() {    
+		navigator.notification.confirm(        
+		'You are the winner!',  // 訊息        
+		onConfirm,              // 呼叫函式
+		'Game Over',            // 標題        
+		'Restart,Exit'          // 按鈕名稱(ok,cancel)
+		);
+	}
+	//使用系統音提示通知
+	function playBeep() {        
+		//撥放3次系統音
+		navigator.notification.beep(3);    
+	}
+	//使用震動通知
+	function vibrate() {       
+		//震動通知(毫秒) 
+		navigator.notification.vibrate(2000);    
+	}
+</script>
+<body>
+	<Button onClick="showAlert();">顯示通知</Button>
+	<Button onClick="showConfirm();">顯示確認通知</Button>
+	<Button onclick="playBeep();">撥放系統音</Button>
+	<Button onclick="vibrate();">震動通知</Button>
+</body>
+</html>

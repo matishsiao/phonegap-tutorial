@@ -1,0 +1,91 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>Get remote data</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	var serverData = '';//宣告Server回傳資料暫存變數
+	var network = false;//宣告網路連線狀態值
+	//監聽裝置準備完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+	//裝置準備完成
+  function onDeviceReady() {    	
+		//顯示初始化訊息在畫面上
+		showMessage("裝置初始化完成");		
+		//檢查網路連線
+		onOnline();
+		appInit();        
+  } 
+  //檢查網路連線
+  function onOnline() {
+  	if(checkConnection()){
+       	showMessage("網路已連線");
+       	network = true;
+    }else{
+      	showMessage("網路尚未連線");
+       	network = false;
+     }
+  }   
+  //顯示訊息在畫面上 
+  function showMessage(_msg){
+    var report = document.getElementById('report');
+    if(report != null)
+		report.innerHTML +=  _msg + '<BR>';
+  }
+  //APP初始化
+	function appInit(){
+		//定時取得Server回傳的資料,500毫秒確認一次
+		setInterval("checkServerData()",500);	
+	}
+	//檢查Server是否有回傳資料
+	function checkServerData(){
+		//如果有回傳資料則顯示在畫面上
+		if(serverData != ''){			
+			showMessage(serverData);
+			serverData = '';	
+		}
+	}
+	//檢查網路連線狀態
+	function checkConnection() {
+    	var networkState = navigator.network.connection.type;
+    	var states = {};
+    	states[Connection.UNKNOWN]  = 'Unknown connection';
+    	states[Connection.ETHERNET] = 'Ethernet connection';
+    	states[Connection.WIFI]     = 'WiFi connection';
+    	states[Connection.CELL_2G]  = 'Cell 2G connection';
+    	states[Connection.CELL_3G]  = 'Cell 3G connection';
+    	states[Connection.CELL_4G]  = 'Cell 4G connection';
+    	states[Connection.NONE]	= 'No network connection';
+		if(states[networkState] != 'No network connection' && states[networkState] != 'Unknown connection' && states[networkState] != null)
+			return true;
+		else
+			return false;
+	}
+	//取得使用者輸入的資料並傳送到遠端伺服器做處理
+	function getInputText(){	
+		var userData = document.getElementById('userData');
+		if(checkConnection()){
+			if(userData != null){
+				var obj = document.createElement('script');
+				var url = 'http://www.sbiec.com/phonegap/?id=' + userData.value;
+				console.log("url:" + url);
+				obj.src = url;				
+				document.body.appendChild(obj);				
+			}
+		}else
+			showMessage("網路尚未連線");
+	}	
+</script>
+<body>
+	<div style="width:100%; height:20%;">	
+		<p align="center">
+		<input type='text' id='userData' name='userData' style="font-size:18pt" size="20">
+		<br />
+		<Button style= "font-size:20pt" onclick="getInputText();">取得遠端伺服器資料</Button>
+		</p>
+	</div>
+	<p align="left">系統訊息:</p>
+	<div id='report' name='report' style="vertical-align:top; text-align:left;" width="<script>window.innerWidth</script>"></div>		
+</body>
+</html>

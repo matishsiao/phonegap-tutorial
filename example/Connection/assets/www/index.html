@@ -1,0 +1,43 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>Connection</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	//監聽PhoneGap裝置初始化完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+	//裝置初始化完成
+  function onDeviceReady() {    			
+		onOnline();		
+  } 
+  //檢查網路連線
+  function onOnline() {
+  	if(checkConnection())
+    	alert("網路已連線");
+    else
+     	alert("網路尚未連線");
+  }    
+  //檢查網路連線
+	function checkConnection() {
+		//取得目前網路連線狀態
+    var networkState = navigator.network.connection.type;
+    var states = {};
+    states[Connection.UNKNOWN]  = 'Unknown connection';//不知名的網路
+    states[Connection.ETHERNET] = 'Ethernet connection';//乙太網路
+    states[Connection.WIFI]     = 'WiFi connection';//WiFi無線網路
+    states[Connection.CELL_2G]  = 'Cell 2G connection';//2G網路
+    states[Connection.CELL_3G]  = 'Cell 3G connection';//3G網路
+    states[Connection.CELL_4G]  = 'Cell 4G connection';//4G網路
+    states[Connection.NONE]	= 'No network connection';//沒有網路連線
+    //如果網路狀態不是為不知名的網路,沒有網路連線,也不是空值,則表示有網路連線
+		if(states[networkState] != 'No network connection' && states[networkState] != 'Unknown connection' && states[networkState] != null)
+			return true;
+		else
+			return false;
+	}	
+</script>
+<body>
+	<H1>網路連線測試</H1>
+</body>
+</html>

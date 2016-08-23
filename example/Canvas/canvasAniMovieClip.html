@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Canvas MovieClip</title>
+    <script type="text/javascript">
+    <!--
+    	//宣告圖片資源
+			var img = new Image();		 
+			
+			//讀取圖片資源
+			img.src = 'images/gatling_001.png';
+			
+			//Canvas 寬度
+			var CANVAS_WIDTH = 100;
+			
+			//Canvas 高度
+			var CANVAS_HEIGHT = 100;
+			
+			//一影格撥放週期 值越大則速度越慢
+			var frameCycle = 300; 
+			
+			//Canvas context資源
+			var ctx;
+			
+			//現在的影格索引值
+			var nowFramesIndex = 0;
+			
+			//目前影格方向
+			var frameWay = true;
+			//最後一格影格
+			var maxFramesIndex = 16;
+			
+			
+			
+			
+			//網頁初始化
+			function init() {
+				//取得Canvas資源
+			   ctx = document.getElementById('canvas').getContext('2d');
+			   
+			   //開始繪製圖片
+			   return setInterval(draw, frameCycle);
+			}
+			
+			
+			
+			//繪製圖層
+			function draw() {
+			
+				//清空繪圖區
+				//如果過了180度則翻轉撥放				
+				if(frameWay == false){
+					//修改原點座標原本為左上,因為已經翻轉了所以原點座標也要翻轉改為右上
+					ctx.translate(CANVAS_WIDTH , 0);	
+				}else
+					ctx.translate(0 , 0);	
+     		//	ctx.scale(-1, 1);
+				ctx.clearRect(0,0,100,100);
+				
+				//如果圖檔存在則繪製圖片到Canvas上
+				if(img != null){
+					//----------------------------------------
+					//繪製圖片
+					//指令說明:
+					//img,來源的起始X座標,來源的起始Y座標,來源圖檔寬度,來源圖檔高度,繪製點 x,繪製點 y,繪製寬度,繪製高度
+					//----------------------------------------
+					//因為圖片是用2*10小格組成,所以當大於9就要讀下一列的圖片位置
+					
+					if(nowFramesIndex < 10)
+				  	ctx.drawImage(img,100*nowFramesIndex,0,CANVAS_WIDTH,CANVAS_HEIGHT,0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+				  else
+				  	ctx.drawImage(img,100*(nowFramesIndex - 10),100,CANVAS_WIDTH,CANVAS_HEIGHT,0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+				  if(frameWay == false){	
+				  	//修改原點座標,因為已經翻轉了所以原點座標也要翻轉改為右上
+				   	ctx.translate(CANVAS_WIDTH , 0);
+				   	//水平翻轉
+    			 	ctx.scale(-1, 1);
+    			}else
+						ctx.translate(0 , 0);	
+
+     				
+				    	
+				}else
+				   	trace("Image is null");
+				
+				
+				//重複繪製圖片
+				//如果現在是由又到左讀圖則把影格索引值加1直到最大值在改變為由左到右讀圖
+				if(frameWay == true){
+					nowFramesIndex++;			
+					if(nowFramesIndex >= maxFramesIndex){
+				 		nowFramesIndex = maxFramesIndex - 1;
+				 		frameWay = false;
+				 	}
+				}else{
+					nowFramesIndex--;			
+					if(nowFramesIndex < 0){
+				 		nowFramesIndex = 0;
+				 		frameWay = true;
+				 	}
+				}
+			}
+			
+			
+			
+			//追蹤除錯訊息
+			function trace(msg){
+				
+					var traceBox = document.getElementById('trace');
+					
+					traceBox.innerHTML += msg + '<br>';
+			}
+			
+    //-->
+    </script>
+  </head>
+  	<body onload="init();">
+  	<p>Canvas動畫展示</p>
+		<canvas id="canvas" width="100" height="100"></canvas>
+		
+		<div id="trace"></div>
+	</body>
+</html>

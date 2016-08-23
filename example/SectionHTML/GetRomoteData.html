@@ -1,0 +1,84 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>HRMS</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	var reportData = '';	
+	document.addEventListener("deviceready",onDeviceReady,false);
+
+    // PhoneGap is ready to be used!
+    //
+    
+    function onDeviceReady() {    	
+		showMessage("裝置初始化完成");		
+		onOnline();
+		//document.addEventListener("online", onOnline, false);
+		//document.addEventListener("offline", onOnline, false);			
+        WebInit();        
+    } 
+    function onOnline() {
+    	if(checkConnection())
+        	showMessage("網路已連線");
+        else
+        	showMessage("網路尚未連線");
+    }    
+    function showMessage(_msg){
+    	var reportError = document.getElementById('reportError');
+    	if(reportError != null)
+			reportError.innerHTML +=  _msg + '<BR>';
+    }
+	function WebInit(){
+		setInterval("TaskManager()",100);	
+	}
+	function TaskManager(){
+		if(reportData != ''){			
+			showMessage(reportData);
+			reportData = '';	
+		}
+	}
+	function checkConnection() {
+    	var networkState = navigator.network.connection.type;
+    	var states = {};
+    	states[Connection.UNKNOWN]  = 'Unknown connection';
+    	states[Connection.ETHERNET] = 'Ethernet connection';
+    	states[Connection.WIFI]     = 'WiFi connection';
+    	states[Connection.CELL_2G]  = 'Cell 2G connection';
+    	states[Connection.CELL_3G]  = 'Cell 3G connection';
+    	states[Connection.CELL_4G]  = 'Cell 4G connection';
+    	states[Connection.NONE]	= 'No network connection';
+		if(states[networkState] != 'No network connection' && states[networkState] != 'Unknown connection' && states[networkState] != null)
+			return true;
+		else
+			return false;
+	}
+	function getInputText(){	
+		var uid = document.getElementById('reportUId');
+		if(checkConnection()){
+			if(uid != null){
+				var obj = document.createElement('script');
+				var url = 'http://www.sbiec.com/phonegap/?id=' + uid.value;
+				console.log("url:" + url);
+				obj.src = url;				
+				document.body.appendChild(obj);				
+			}
+		}else
+			showMessage("網路尚未連線");
+	}	
+</script>
+<body>
+<div id = "errorReportTable" name = "errorReportTable" style="width:100%; height:20%;">
+					
+		
+			<p align="center">
+				<input type='text' id='reportUId' name='reportUId' style= "font-size:18pt" size="20">
+				<BR>
+				<input type='button' id='getUidReport' name='getUidReport' style= "font-size:20pt" value='取得玩家錯誤報告' onclick=getInputText()>
+			</p>
+			</BR>
+		</div>
+		<p align="left">訊息:</p>
+		<div id='reportError' name='reportError' style="vertical-align:top; text-align:left;" width="<script>window.innerWidth</script>"></div>		
+
+</body>

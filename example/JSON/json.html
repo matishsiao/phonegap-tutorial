@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>JSON</title>
+  </head>
+  <script>
+	 
+		function showJSONParse(){
+			var jsonData = '{"uid": "u110001","male": true,"age": 25,"info": {"name":"Matis Hsiao"}, "detail": [ { "userType": "VIP", "point":10 }]}';
+			//解析JSON字串資料
+			var user = JSON.parse(jsonData);
+			//顯示解析的資料
+			var info = document.getElementById("info");
+			info.innerHTML = "UID:" + user.uid + "<br>";
+			info.innerHTML += "性別:" + (user.male)?"男":"女" + "<br>";
+			info.innerHTML += "姓名:" + user.info.name + "<br>";
+			info.innerHTML += "會員種類:" + user.detail[0].userType + "<br>";
+			info.innerHTML += "點數:" + user.detail[0].point + "<br>";
+		}
+  </script>
+  <body>
+  	<button onClick="showJSONParse();">ShowUserInfo</button>
+  	<div id="info">
+  	</div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>Connection</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	 var watchID = null;//監聽ID
+	 var GPSText = "";//GPS文字
+	//監聽PhoneGap裝置初始化完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+	//裝置初始化完成
+  function onDeviceReady() {    			
+		//取得GPS座標
+     	navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);  
+     	   
+  } 
+	 //取得GPS座標並產生文字
+    function onGPSSuccess(position) {
+            var element = document.getElementById('geolocation');        
+            element.innerHTML = '緯度: '           + position.coords.latitude              + '<br />' +                            
+            '經度: '          + position.coords.longitude             + '<br />' +                            
+            '海拔高度: '           + position.coords.altitude              + '<br />' +                            
+            '精度: '           + position.coords.accuracy              + '<br />' +                            
+            '高度的精度: '  + position.coords.altitudeAccuracy      + '<br />' +                            
+            '標題: '            + position.coords.heading               + '<br />' +                            
+            '速度: '              + position.coords.speed                 + '<br />' +                            
+            '時間戳: '          + new Date(position.timestamp)          + '<br />';    
+            GPSText = "緯度:" + position.coords.latitude + "經度" + position.coords.longitude;
+            console.log("緯度:" + position.coords.latitude + "經度" + position.coords.longitude);
+    }    
+  //GPS座標取得失敗  
+  function onGPSError(error) {
+     alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');               
+     GPSText = "GPS尚未定位"; 
+     var element = document.getElementById('geolocation');        
+     element.innerHTML = GPSText;
+  }    
+  //定時監聽GPS
+  function getWatchGPS(){
+  	//每3秒監聽GPS座標
+     	var options = { frequency: 3000 };        
+     	watchID = navigator.geolocation.watchPosition(onSuccess, onError, options); 
+  }
+  //清除監聽事件
+  function cleanWatchGPS(){
+  	 if (watchID != null) {
+  	 	    navigator.geolocation.clearWatch(watchID);            
+  	 	    watchID = null;       
+  	 }
+  }
+  //取得GPS座標成功  
+  function onSuccess(position) {        
+  	var element = document.getElementById('geolocation'); 
+  	element.innerHTML = '緯度: '           + position.coords.latitude              + '<br />' +                            
+            '經度: '          + position.coords.longitude             + '<br />' +                            
+            '海拔高度: '           + position.coords.altitude              + '<br />' +                            
+            '精度: '           + position.coords.accuracy              + '<br />' +                            
+            '高度的精度: '  + position.coords.altitudeAccuracy      + '<br />' +                            
+            '標題: '            + position.coords.heading               + '<br />' +                            
+            '速度: '              + position.coords.speed                 + '<br />' +                            
+            '時間戳: '          + new Date(position.timestamp)          + '<br />';           
+  }
+  //GPS座標取得失敗 
+ 	function onError(error) {       
+ 		 alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');    
+  }
+</script>
+<body>
+	<p id="geolocation">GPS定位中....</p>  
+	<button onclick="getWatchGPS();">定時取得GPS座標</button>
+	<button onclick="cleanWatchGPS();">停止取得GPS座標</button>
+</body>
+</html>

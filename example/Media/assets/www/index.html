@@ -1,0 +1,178 @@
+<html>	
+	<head>
+  	<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+    <title>Event</title>
+  </head>
+  <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+  <script type="text/javascript" charset="utf-8">
+	//宣告變數
+	var my_media = null;//宣告媒體物件      
+	var mediaRec = null;//宣告錄音媒體物件  
+  var mediaTimer = null;//宣告媒體計時器物件
+  var recTimer = null;//宣告錄音計時器物件
+  var nowPlaySec = 0;//目前撥放秒數
+  var dur = 0;//總長度
+  var recSrc = "myrecording.mp3";//錄音存檔檔名
+  var src = '';//宣告媒體來源
+	//監聽PhoneGap裝置初始化完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+	//裝置初始化完成
+  function onDeviceReady() {
+  	//設定音樂檔名
+  	src = "/android_asset/www/audio/audio_1.mid";  	
+  }
+  //播放媒體  
+  function playNewAudio(src) {  
+  	//如果以設定媒體來源則先釋放資源         
+  	if(my_media)
+  		my_media.release();
+  	//建立Media物件
+  	my_media = new Media(src, onSuccess, onError);            
+  	//播放          
+  	my_media.play();            
+  	//設定計時器作為更新音樂播放時間
+  	if (mediaTimer == null) {             
+  		getMediaDur();  		
+  	 	mediaTimer = setInterval(function() {
+  	 		//取得目前音樂的撥放時間                  
+  	 		my_media.getCurrentPosition(                        
+  	 			//如果取得成功後呼叫更新撥放時間                        
+  	 		  function(position) {                            
+  	 		  	if (position > -1) {                                
+  	 		  		setAudioPosition((position) + " sec");  
+  	 		  		nowPlaySec = position;                        
+  	 		  		}                        
+  	 		  },                        
+  	 		  //取得播放時間失敗
+  	 		  function(e) {                            
+  	 		  	console.log("Error getting pos=" + e);                            
+  	 		  	setAudioPosition("Error: " + e);                        
+  	 		  }                    
+  	 		);                
+  	 	//每秒處理一次
+  	 	},1000);            
+		}        
+  } 
+  //取得音樂媒體成功
+  function onSuccess() {            
+  	console.log("playAudio():Audio Success");        
+  }        
+  //取得媒體失敗
+  function onError(error) {            
+  	alert('code: '    + error.code    + '\n' +                   
+  	'message: ' + error.message + '\n');        
+  }  
+  function getMediaDur(){
+  	// Get duration    
+  	var counter = 0;    
+  	var timerDur = setInterval(function() {        
+  		counter = counter + 100;        
+  		if (counter > 2000) {            
+  			clearInterval(timerDur);        
+  		}        
+	  	dur = my_media.getDuration();        
+	  	if (dur > 0) {            
+	  		clearInterval(timerDur);            
+	  		document.getElementById('audio_duration').innerHTML = "總長度:" + (dur) + " sec";        
+	  	}   
+  	}, 100);
+  }
+  /*播放音樂   
+   params src 來源路徑
+   params mode 是否重新讀取
+  */
+  function playAudio(src,mode) {     
+  	//如果為true則重新讀取
+  	if(mode){
+  		playNewAudio(src); 
+  	//如果為false則確認是否有音樂檔資源
+  	}else{  	
+	  	//如果已經有開啟音樂檔,則直接重新撥放       
+	  	if (my_media) {                
+	  		my_media.play();            
+	  	}else{
+	  		playNewAudio(src); 
+	  	}
+  	}
+  }        
+  //暫停音樂   
+  function pauseAudio() {            
+  	if (my_media) {                
+  		my_media.pause();            
+  		}        
+  }        
+  //停止音樂 
+  function stopAudio() {            
+  	if (my_media) {                
+  		my_media.stop(); 
+  		my_media.release();           
+  	}            
+  	clearInterval(mediaTimer);            
+  	mediaTimer = null;        
+  }              
+  //設定目前的播放狀態  
+  function setAudioPosition(position) {            
+  	document.getElementById('audio_position').innerHTML = position;        
+  } 
+  function startRecord(){
+  	console.log("recordAudio():start Record:" + recSrc); 
+  	mediaRec = new Media(recSrc, onRecSuccess,onRecError);
+		mediaRec.startRecord();       
+		//停止目前播放的音樂
+		stopAudio();
+		var recTime = 0;
+		if (recTimer == null) {          
+			 recTimer = setInterval(function() {            
+			 recTime = recTime + 1;            
+		 	 setAudioPosition("record:" + recTime + " sec");                    
+			 }, 1000);
+		}      	 
+  }  
+  //當按下停止時才會進行存檔並觸發錄音完成事件
+  function onRecSuccess() {            
+	  	 	console.log("recordAudio():Audio Success"); 
+	  	 	// Record audio  
+	  	 
+	} 
+	//錄音失敗
+	function onRecError(err) {            
+	  	 	console.log("recordAudio():Audio Error: "+ err.code);        
+	}
+	//停止錄音
+  function stopRecord(){
+  	//如果錄音物件存在則清除錄音計時器
+  	if(mediaRec){
+  	 	clearInterval(recTimer);                
+  	 	mediaRec.stopRecord();
+  	 	recTimer = null;
+  	}
+  }  
+  //撥放錄音檔
+  function playRecord(){
+  	playNewAudio(recSrc);   
+  }
+  //快轉音樂
+  function playForward(){
+  	if(my_media){
+  	 var nextTime = parseInt(nowPlaySec*1000 + 5000);
+  	 if(nextTime >= dur*1000)
+  	 	nextTime = 0;
+  	 console.log("nextTime:" + nextTime + " nowPlaySec:" + nowPlaySec + " dur:" + dur);
+  	 my_media.seekTo(nextTime);
+  	}
+  }
+  </script>      
+  </head>      
+  <body>        
+  	<Button onclick="playAudio('http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3',true);">撥放網路來源音樂</Button><br />
+  	<Button onclick="playAudio(src,false);">撥放音樂</Button>
+  	<Button onclick="playForward(5);">快轉音樂</Button>
+  	<Button onclick="pauseAudio();">暫停播放</Button>
+  	<Button onclick="stopAudio();">停止播放</Button><br />  	  	     	
+  	<Button onclick="startRecord();">開始錄音</Button>
+  	<Button onclick="stopRecord();">停止錄音</Button>
+  	<Button onclick="playRecord();">播放錄音</Button><br />
+  	<p id="audio_position"></p>
+  	<p id="audio_duration"></p>           
+  </body>    
+  </html>

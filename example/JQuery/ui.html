@@ -1,0 +1,96 @@
+﻿<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+    
+  </head>
+  <link rel="stylesheet" href="jquery/themes/base/jquery.ui.all.css">
+	<script src="jquery/jquery-1.7.2.js"></script>
+	<script src="jquery/ui/jquery.ui.core.js"></script>
+	<script src="jquery/ui/jquery.ui.widget.js"></script>
+	<script src="jquery/ui/jquery.ui.button.js"></script>
+	<link rel="stylesheet" href="jquery/demos.css">
+  <style type="text/css">  
+  	#menu {display: none}  
+ 	
+	</style>  
+	
+	
+  <script>
+	  //當網頁讀取完成,執行初始化
+		$(document).ready(function(){
+				jQueryInit();
+		
+		});
+		
+		
+		//jQuery初始化,監聽事件及執行JQuery設定
+		function jQueryInit(){
+			
+			
+			//對<a>元素中id 為 open 監聽點擊動作
+			$("a#open").click(function() {  
+				//顯示menu並且使用快速下拉效果動畫
+		  	$("#menu").slideDown("fast");  
+		  	return false;  
+			});  
+			
+			
+			//對<a>元素中id 為 close 監聽點擊動作
+			$("a#close").click(function() {  
+				//隱藏menu
+		  	$("#menu").hide(1000);  		  	
+		  	return false;  
+			});  			
+			
+			
+			//將div隱藏500ms再顯示
+			$("div").hide(500, function(){  
+			  // $(this) 是每一個各別的 <div>  
+			  $(this).show(500);  
+			});
+			
+			
+			//讀取include網頁中的全部div資訊並把它放到id=body的物件內
+			$("#body").load("include.html div");  
+			
+			
+			//套用JQuery UI CSS
+			$(function() {
+				//將input type為submit 及<a> <button>,使用.demo CSS設定視為buution物件
+				$( "input:submit, a, button", ".demo" ).button();
+				
+				//當<a>或是.demo CSS被使用者點擊觸發事件
+				$( "a", ".demo" ).click(
+					function() {return false;}
+				);
+			});
+		}
+			
+		
+		
+  </script>
+
+<body>
+	
+	
+	<div class="demo">
+		<a id="open" href="#" target="_self">詳細選項</a><br />
+	
+	<ul id="menu">  
+	  <li><a id="edit" href="#1">編輯個人資料</a></li>  
+	  <br />
+	  <li><a id="logout" href="#2">登出</a></li>  
+	  <br />
+	  <li><a id="close" href="#3">關閉選項</a></li>  
+		<br />
+	</ul>  
+	
+		<button> 按鈕 </button>
+		
+		<input value="送出" type="submit">
+		
+	</div>
+</body>
+</html>

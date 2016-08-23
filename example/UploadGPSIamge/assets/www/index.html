@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	 <meta charset="utf-8">
+    <title>File Transfer Example</title>
+    <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>    
+    <script type="text/javascript" charset="utf-8">     
+    var pictureSource;   // 圖片來源
+    var destinationType; //設定回傳的圖片資源類型
+    var imageURI; //圖片URI資源
+    var GPSText; //GPS文字
+    var img = new Image();//DOM圖片元件
+    //監聽Phonegap裝置準備完成事件
+    document.addEventListener("deviceready", onDeviceReady, false);        
+    //PhoneGap準備完成
+    function onDeviceReady() {     
+    	//設定圖片來源
+ 			pictureSource=navigator.camera.PictureSourceType;        
+ 			//設定回傳圖片資源類型
+     	destinationType=navigator.camera.DestinationType;      
+     	//取得GPS座標
+     	navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);  
+    } 
+    //取得GPS座標並產生文字
+    function onGPSSuccess(position) {
+            var element = document.getElementById('geolocation');        
+            element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +                            
+            'Longitude: '          + position.coords.longitude             + '<br />' +                            
+            'Altitude: '           + position.coords.altitude              + '<br />' +                            
+            'Accuracy: '           + position.coords.accuracy              + '<br />' +                            
+            'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +                            
+            'Heading: '            + position.coords.heading               + '<br />' +                            
+            'Speed: '              + position.coords.speed                 + '<br />' +                            
+            'Timestamp: '          + new Date(position.timestamp)          + '<br />';    
+            GPSText = "緯度:" + position.coords.latitude + "經度" + position.coords.longitude;
+    }    
+    //GPS座標取得失敗  
+    function onGPSError(error) {
+            alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');   
+            GPSText = "GPS尚未定位"; 
+    }    
+    //拍照
+    function capturePhoto() { 
+    	//使用裝置的相機拍照並存成base64編碼字串
+    	navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });    
+    }
+    //拍照完成,儲存相片資訊並顯示預覽
+    function onPhotoDataSuccess(imageData) {           
+      //除錯模式,使用log顯示圖片編碼字串 
+      //console.log(imageData);      
+      //取得預覽圖片物件
+      var largeImage = document.getElementById('largeImage');   
+      //使用CSS開啟預覽圖片的顯示
+      largeImage.style.display = 'block';     
+      //顯示圖片
+      largeImage.src = "data:image/jpeg;base64," + imageData;        
+      //img圖片資源
+      img.src = "data:image/jpeg;base64," + imageData;        	
+    }    
+    //拍照失敗   
+    function onFail(message) {      
+    	alert('Failed because: ' + message);    
+    }         
+    //繪製GPS文字到Canvas畫布上     
+		function drawGPSText() {
+		    //取得 Canvas物件
+		    var ctx = document.getElementById('canvas').getContext('2d');
+		    //繪製拍照出來的相片到Canvas畫布上
+		    ctx.drawImage(img,0,0,600,480); 	
+		    //設定GPS文字格式	   
+		   	ctx.font = 'bold 14px sans-serif';
+		    ctx.fillStyle    = '#FFFFFF';
+				ctx.textBaseline = 'top';			
+				//繪製GPS文字到Canvas畫布上
+				ctx.fillText  (GPSText, 0, 450);
+		}
+		//傳送圖片資料到PHP Server上並存檔成png圖檔
+		function sendDataToServer(){
+			 var img = document.getElementById('canvas').toDataURL("image/png"); 
+			 if(img != null)
+			 	post_to_url('http://www.sbiec.com/phonegap/canvasUpload.php', {'data':img});
+		}    
+		/*傳送資料到http server,使用DOM建立一個空白表單傳送資料到HTTP Server
+		參數:
+			1.path:HTTP Server URL路徑
+			2.params:參數陣列
+			3.method:傳送方式 get,post
+		*/
+		function post_to_url(path, params, method) {
+				//設定預設方法為POST,GET會有200字元上限限制
+		    method = method || "post"; 
+		
+		    //建立空白表單
+		    var form = document.createElement("form");
+		    //設定方法
+		    form.setAttribute("method", method);
+		    //設定URL路徑
+		    form.setAttribute("action", path);
+			  //設定參數陣列
+		    for(var key in params) {
+		    	  //建立隱藏欄位物件
+		        var hiddenField = document.createElement("input");
+		        //設定屬性為隱藏
+		        hiddenField.setAttribute("type", "hidden");
+		        //設定名稱
+		        hiddenField.setAttribute("name", key);
+		        //設定值
+		        hiddenField.setAttribute("value", params[key]);
+						//將參數新增到空白表單內
+		        form.appendChild(hiddenField);
+		    }
+				//將空白表單加入到網頁文件
+		    document.body.appendChild(form);
+		    //執行送出
+		    form.submit();
+		}
+    </script>
+</head>
+ <body>       	
+	<button onclick="capturePhoto();">From Camera</button>
+	<br />       
+	<button onclick="drawGPSText();">draw Image with GPS text</button>	
+	<br />       
+	<p id="geolocation">Finding geolocation...</p>  
+	<br />        
+	<canvas id="canvas" width="600" height="480">Canvas is not ready.</canvas>
+	<br />       
+	<img style="display:none;" id="largeImage" src="" />  
+	<br />       
+	<button onClick="sendDataToServer();">SendDataToServer</button>
+ </body>
+</html>

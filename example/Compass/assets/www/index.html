@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+    <title>Compass</title>
+
+   	<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+    <script type="text/javascript" charset="utf-8">  
+    var watchID = null;//宣告監聽ID
+
+    //監聽裝置準備完成事件
+    document.addEventListener("deviceready", onDeviceReady, false);
+		//裝置準備完成
+    function onDeviceReady() {
+    	//取得當下的指南針資訊
+    	 navigator.compass.getCurrentHeading(onSuccess, onError);     
+    }
+ 		function onSuccess(heading) {
+    	 alert('角度: ' + heading.magneticHeading);      
+    }
+    //定時監聽指南針資訊每1秒監聽一次
+    function startWatch() {
+        //每1秒更新一次
+        var options = { frequency: 1000 };
+        watchID = navigator.compass.watchHeading(onWatchSuccess, onError, options);
+    }
+    //停止監聽事件
+    function stopWatch() {
+        if (watchID) {
+            navigator.compass.clearWatch(watchID);
+            watchID = null;
+        }
+    }
+    /*//當指南針角度變化超過10度則觸發事件
+    function startWatchFilter() {
+        //當指南針角度變化超過10度
+         var options = { filter: 10 };  
+         //當指南針角度變化超過10度則觸發事件
+         watchID = navigator.compass.watchHeadingFilter(onWatchFilterSuccess, onError, options);
+    }
+    //停止監聽事件
+    function stopWatchFilter() {
+        if (watchID) {
+            navigator.compass.clearWatch(watchID);
+            watchID = null;
+        }
+    }
+    //取得過濾後的指南針資訊
+    function onWatchFilterSuccess(heading) {
+        showWatch(heading.magneticHeading);         
+    }*/
+		//取得監聽資訊
+    function onWatchSuccess(heading) {
+    	showWatch(heading.magneticHeading);        
+    }
+    //顯示指南針資訊
+    function showWatch(degrees){
+    	 var element = document.getElementById('heading');
+        var way = document.getElementById('way');
+        if(parseInt(degrees) == 0)
+        	way.innerHTML = "北";
+        else if(parseInt(degrees) <= 45)
+        	way.innerHTML = "東北";
+        else if(parseInt(degrees) == 90)
+        	way.innerHTML = "東";
+        else if(parseInt(degrees) <= 135)
+        	way.innerHTML = "東南";
+        else if(parseInt(degrees) == 180)
+        	way.innerHTML = "南";
+        else if(parseInt(degrees) <= 225)
+        	way.innerHTML = "西南";
+        else if(parseInt(degrees) == 270)
+        	way.innerHTML = "西";
+        else if(parseInt(degrees) <= 315)
+        	way.innerHTML = "西北";
+        element.innerHTML = '指向: ' + degrees + ' 度';   
+		}
+    //資料取得錯誤
+    function onError() {
+        alert('指南針資料取得錯誤:'+ compassError.code);        
+    }
+
+    </script>
+  </head>
+  <body>
+    <div id="heading">等待指向資料中..</div>
+    <br />
+    <div id="way">等待指向資料中..</div>
+    <br />
+    <button onclick="startWatch();">開始指南針監聽</button>
+    <button onclick="stopWatch();">停止指南針監聽</button>
+    <br />
+  </body>
+</html>

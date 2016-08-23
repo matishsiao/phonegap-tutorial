@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+    
+  </head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+  <style type="text/css">  
+  	#menu {display: none}  
+  	.block { 
+	    color: white;
+	    background-color: #68BFEF;
+	    width: 150px; 
+	    height: 70px;
+	    margin: 10px; 
+  	}
+  	a {
+  		color: #000000;
+  		text-decoration: none; 
+  		PADDING-RIGHT: 1px;
+  		PADDING-LEFT: 1px; 
+  		PADDING-BOTTOM: 1px; 
+  		PADDING-TOP: 1px; 
+  		background-color:#EEEBFF; 
+  		height: 20px; 
+  		width: 120px; 
+  		text-align: center; 
+  		border: #A498BD; 
+  		border-style: outset; 
+  	}
+    a:hover { 
+    	BORDER-RIGHT: #605080 1px outset; 
+    	PADDING-RIGHT: 1px; 
+    	BORDER-TOP: #605080 1px outset; 
+    	PADDING-LEFT: 1px; 
+    	PADDING-BOTTOM: 1px; 
+    	BORDER-LEFT: #605080 1px outset; 
+    	PADDING-TOP: 1px; 
+    	BORDER-BOTTOM: #605080 1px outset;
+    	background-color:#BDAAE2; 
+    	height: 20px; 
+    	width: 120px; 
+    	text-align: center; 
+    } 
+  	
+	</style>  
+  <script>
+	  //當網頁讀取完成,執行初始化
+		$(document).ready(function(){
+				jQueryInit();
+		
+		});
+		//jQuery初始化,監聽事件及執行JQuery設定
+		function jQueryInit(){
+			
+			
+			//對<a>元素中id 為 open 監聽點擊動作
+			$("a#open").click(function() {  
+				//顯示menu並且使用快速下拉效果動畫
+		  	$("#menu").slideDown("fast");  
+		  	return false;  
+			});  
+			
+			
+			//對<a>元素中id 為 close 監聽點擊動作
+			$("a#close").click(function() {  
+				//隱藏menu
+		  	$("#menu").hide(1000);  		  	
+		  	return false;  
+			});  			
+			
+			
+			//將div隱藏500ms再顯示
+			$("div").hide(500, function(){  
+			  // $(this) 是每一個各別的 <div>  
+			  $(this).show(500);  
+			});
+			
+			
+			//讀取include網頁中的全部div資訊並把它放到id=body的物件內
+			$("#body").load("include.html div");  
+			
+			
+			//對Class 為 block的監聽切換事件			
+			$(".block").toggle(
+				function() {
+					//將block的背景色改為黑色
+    			$(this).animate({ backgroundColor: "black" }, 1000);
+				},
+				function() {
+					//將block的背景色改為紅色	
+    			$(this).animate({ backgroundColor: "#FF0000" }, 5500);
+				});
+			}
+		
+  </script>
+
+<body>
+	<a id="open" href="#" target="_self">詳細選項</a>  
+	
+	<ul id="menu">  
+	  <li><a id="edit" href="#1">編輯個人資料</a></li>  
+	  <br></br>
+	  <li><a id="logout" href="#2">登出</a></li>  
+	  <br></br>
+	  <li><a id="close" href="#3">關閉選項</a></li>  
+		<br></br>
+	</ul>  
+	
+	<div id="body"></div>
+	
+	<div class="block" style="width:100px;height:25px"><p align="center">點擊變色</p></div>
+</body>
+</html>

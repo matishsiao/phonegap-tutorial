@@ -1,0 +1,60 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>Accelerometer</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	//宣告監聽ID
+	var watchID = null;
+	//監聽PhoneGap裝置初始化完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+ 	//裝置初始化完成
+  function onDeviceReady() {        
+  	//取得目前加速度計資料
+    navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);    
+  }    
+  // 取得加速度計資料   
+  function onSuccess(acceleration) {        
+  	alert('加速度 X軸: ' + acceleration.x + '\n' +
+           '加速度 Y軸: ' + acceleration.y + '\n' +
+           '加速度 Z軸: ' + acceleration.z + '\n' +
+           '時間戳: '      + acceleration.timestamp + '\n');    
+  
+  }
+  //加速度資料取得失敗
+  function onError() {
+  	alert('加速度資料取得失敗');    
+  }
+  //使用定時監聽加速度資料
+  function watchAccelerometer(){
+  	//每3秒取得一次資料
+  	var options = { frequency: 3000 };  
+  	watchID = navigator.accelerometer.watchAcceleration(onWatchAccelerSuccess, onError, options);
+  }
+  // 更新加速度計資料   
+  function onWatchAccelerSuccess(acceleration) {        
+  	var element = document.getElementById('accelerometer'); 
+  	element.innerHTML = '加速度 X軸: ' + acceleration.x + '<br />' +
+    '加速度 Y軸: ' + acceleration.y + '<br />' +                            
+    '加速度 Z軸: ' + acceleration.z + '<br />' +                            
+    '時間戳: '      + acceleration.timestamp + '<br />';
+  }
+  //停止監聽事件
+  function stopWatch() {
+  	//如果watchID不是為空值
+  	if (watchID) {
+  		//清除監聽  		
+  		navigator.accelerometer.clearWatch(watchID);  		
+  		watchID = null;
+  		alert("停止監聽加速度計");
+  	}
+  }    
+</script>
+<body>
+	<H1>加速度計測試</H1>
+	<Button onClick="watchAccelerometer();">開始監聽加速度計</Button>
+	<Button onClick="stopWatch();">停止監聽加速度計</Button>
+	<div id="accelerometer">等待加速度計資料中...</div>
+</body>
+</html>

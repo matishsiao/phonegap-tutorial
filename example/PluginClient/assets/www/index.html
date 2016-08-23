@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+			<html>
+			<head>
+			<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+			<title>Plugin 插件示範</title>
+			<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+			<script type="text/javascript" charset="utf-8" src="pluginJS/showTip.js"></script>     
+			<script type="text/javascript" charset="utf-8">
+				var ready = false;
+			 	document.addEventListener("deviceready", onDeviceReady, false);
+			 	function onDeviceReady(){
+			 		ready = true;
+			 		info.innerHTML += "phonegap is ready.call plugin.<br>";  
+			 		callPlugin(1);
+			 	}
+				//呼叫插件函式
+				function callPlugin(pluginCmd){
+					var info = document.getElementById("info");
+					info.innerHTML += "pluginCmd:" + pluginCmd + "<br>";   
+					//window.plugins所呼叫的是 PhoneGap.addPlugin所設定函式名稱                                 
+					window.plugins.showTipPlugin.showTip([pluginCmd,"Plugin"],
+						function(result){
+							//執行成功呼叫
+							info.innerHTML += result + "<br>";                        
+						},
+						function(err){
+							//執行失敗呼叫                  
+							info.innerHTML += '插件執行錯誤: '+ err + "<br>";                        
+						}
+					);
+				}
+			</script>
+			</head>
+			<body>
+			<h1>Plugin 插件示範</h1>
+			<button onClick="callPlugin(1)">呼叫插件版本</button>
+			<button onClick="callPlugin(2)">呼叫插件時間</button>
+			<div id="info">插件回傳資訊:</div>
+			</body>
+			</html>

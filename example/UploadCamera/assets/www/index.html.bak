@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>File Transfer Example</title>
+    <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>    
+    <script type="text/javascript" charset="utf-8">        
+    // Wait for PhoneGap to load        
+    //        
+    document.addEventListener("deviceready", onDeviceReady, false);        
+    // PhoneGap is ready        
+    //        
+    function onDeviceReady() {     
+   // alert("device ready.");       
+    // Retrieve image file location from specified source            
+    	/*navigator.camera.getPicture(uploadPhoto,                                        
+	    function(message) { 
+	    alert('get picture failed'); },                                        
+	    { quality: 50,                                         
+	    destinationType:navigator.camera.DestinationType.FILE_URI,                                        
+	    sourceType:navigator.camera.PictureSourceType.PHOTOLIBRARY }                                        
+    );  */    
+    } 
+    function onPhotoURISuccess(imageURI) {      
+	      // Uncomment to view the image file URI       
+	      // 
+	      console.log(imageURI);      
+	      // Get image handle     
+	       //      
+	       var largeImage = document.getElementById('largeImage');     
+	        // Unhide image elements     
+	         //      
+	         largeImage.style.display = 'block';      
+	         // Show the captured photo      
+	         // The inline CSS rules are used to resize the image      
+	         //     
+	          largeImage.src = imageURI;    
+      }     
+    function getPhoto() {      
+       // Retrieve image file location from specified source      
+       navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,
+       destinationType: navigator.camera.DestinationType.FILE_URI,        
+       sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY });    
+    }    
+    // Called if something bad happens.    
+    //     
+    function onFail(message) {      
+    	alert('Failed because: ' + message);    
+    }      
+    function uploadPhoto() {    
+    	 var largeImage = document.getElementById('largeImage');   
+    	var imageURI = largeImage.src;
+	    var options = new FileUploadOptions();            
+	    options.fileKey="file";            
+	    options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);            
+	    options.mimeType="image/jpeg";            
+	    var params = new Object();            
+	    params.value1 = "test";            
+	    params.value2 = "param";            
+	    options.params = params;            
+	    var ft = new FileTransfer();            
+	    ft.upload(imageURI, "http://www.sbiec.com/phonegap/upload.php", win, fail, options);        
+    }        
+    function win(r) {            
+    console.log("Code = " + r.responseCode);            
+    console.log("Response = " + r.response);            
+    console.log("Sent = " + r.bytesSent);        
+    }        
+    function fail(error) {            
+    alert("An error has occurred: Code = " = error.code);        
+    }        
+    </script>
+</head>
+    <body>    
+    <h1>Example</h1>    
+ <button onclick="getPhoto();">From Photo Library</button>
+ <button onclick="uploadPhoto();">Upload</button>
+ <br>       
+<img style="display:none;" id="largeImage" src="" />   
+    </body>
+</html>

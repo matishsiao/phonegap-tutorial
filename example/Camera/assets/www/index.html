@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>  
+<head>    
+<title>Capture Photo</title>
+ <meta charset="utf-8">
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>    
+<script type="text/javascript" charset="utf-8">
+    var pictureSource;   // 圖片資料來源
+    var destinationType; // 相片回傳資料格式
+    //監聽裝置準備完成事件   
+    document.addEventListener("deviceready",onDeviceReady,false);    
+    // PhoneGap準備完成    
+    function onDeviceReady() {        
+    	//取得目前圖片資料來源格式並存為變數pictureSource 使用
+    	pictureSource = navigator.camera.PictureSourceType;  
+    	//取得目前資料回傳格式並存為變數destinationType使用     
+    	destinationType = navigator.camera.DestinationType;    
+    }   
+    //當相片資料取得完成後呼叫處理DATA_URL的資料格式來源
+		function onPhotoDataSuccess(imageData) {     
+		    //取得smallImage圖片物件
+		    var smallImage = document.getElementById('smallImage');      
+		    //設定圖片元件的顯示格式為block(可見)
+		    smallImage.style.display = 'block';     
+		    //設定圖片來源為目前的相片資料,並使用CSS設定尺寸作為相片縮圖用
+		    smallImage.src = "data:image/jpeg;base64," + imageData;    
+		}
+    //當相片取得完成後呼叫處理FILE_URI的資料格式來源
+		function onPhotoURISuccess(imageURI) {      
+		     //取得largeImage圖片物件
+		    var largeImage = document.getElementById('largeImage');     
+		    //設定圖片元件的顯示格式為block(可見)
+		    largeImage.style.display = 'block';      
+		    //設定圖片元件資料來源為FILE_URI資料格式
+		    largeImage.src = imageURI;    
+		}
+		//呼叫拍照並回傳DATA_URL資料格式的圖片資料
+		function capturePhoto() { 
+		    //拍照並回傳Image Base64編碼的字串資料,相片品質設定為50%
+		    navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });
+		}
+		//呼叫拍照並回傳DATA_URL資料格式的圖片資料,並可做基本編輯
+		function capturePhotoEdit() {      
+		    //拍照並回傳Image Base64編碼的字串資料,相片品質設定為20%,可做簡易編輯
+		    navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20,allowEdit: true });     
+		}
+		//取得相片,透過source參數設定相片資料來源並回傳FILE_URI資料格式
+		function getPhoto(source) {      
+		    //取得相片並回傳FILE_URI資料格式,並設定相片品質50%,
+		    //回傳資料格式為FILE_URI,
+		    //相片來源為source
+		    navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,
+		    destinationType: destinationType.FILE_URI,        
+		    sourceType: source });    
+		} 
+		//相片取得失敗
+		function onFail(message) {      
+		     alert('Failed because: ' + message);    
+		}
+</script>  
+</head>  
+<body>    
+<br><button onclick="capturePhoto();">拍照並回傳為DATA_URL資料格式</button>
+<br><button onclick="capturePhotoEdit();">拍照並可做基本編輯</button>
+<br><button onclick="getPhoto(pictureSource.PHOTOLIBRARY);">從系統相簿取得相片</button>
+<br><button onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);">從相簿取得相片</button>
+<br>縮圖圖片元件(使用CSS設定,預設為隱藏,寬度60px,高度,60px)
+<br><img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
+<br>大圖圖片元件(使用CSS設定,預設為隱藏)
+<br><img style="display:none;" id="largeImage" src="" />
+</body>
+</html>

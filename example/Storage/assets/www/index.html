@@ -1,0 +1,172 @@
+<html>	
+	<head>
+		<meta http-equiv="content-Type" content="text/html;" charset="utf-8">
+<title>Connection</title>
+	</head>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<script type="text/javascript" charset="utf-8">
+	/**宣告變數*/
+	var storage = null;//local Storage
+	var webDB = null;//自建的web database
+	var nowDate = new Date();//JS時間物件
+	var totalRowsNum = 0;//查詢記錄數量
+	//監聽PhoneGap裝置初始化完成事件
+	document.addEventListener("deviceready",onDeviceReady,false);
+	//裝置初始化完成
+  function onDeviceReady() {  
+  	console.log(device.phonegap);  			
+  	storage = window.localStorage;
+		//取得本機檔案系統資源
+		var name = "storageTest";//DB Name
+		var version = "1.0";//版本(可用""開啟全部版本的DB,或是指定開啟特定版本的DB資源)
+		var displayName = "Test DB";//顯示給使用者看的名稱
+		var size = 100000;//可存放的資料上限(位元組)
+		webDB = window.openDatabase(name, version, displayName, size);
+		showDemoData();
+  } 
+ 	function createTable(){//建立資料表
+ 		if(webDB != null){
+ 			 webDB.transaction(createTableSql, errorCB, successCB); 			
+ 		}else
+ 			showAlert("開啟web database 失敗");
+ 	}
+ 	function createTableSql(tx){//資料表語法
+ 		 tx.executeSql('DROP TABLE IF EXISTS webdemo');
+     tx.executeSql('CREATE TABLE IF NOT EXISTS webdemo (id unique, data,time)');    
+     //建立一筆資料,id 為int值所以不需要加入雙引號,後續的查詢也不須使用
+     tx.executeSql('INSERT INTO webdemo (id, data,time) VALUES (1,"first row" ,"' + nowDate.getTime() + '")');   
+ 	}
+ 	function showDemoData(){//顯示目前demo 資料表資料
+ 		if(webDB != null)
+ 			webDB.transaction(showDemoDataSql, errorSQLCB); 		  		 
+ 	}
+ 	function showDemoDataSql(tx){//顯示demo表語法
+ 		tx.executeSql('SELECT * FROM webdemo', [], querySuccess, errorCB);
+	}
+ 	function querySuccess(tx, results) {//查詢成功
+ 	 	cleanMessage();//清除舊有的顯示訊息
+    console.log("Insert ID = " + results.rows.length);
+    var len = results.rows.length;
+    console.log("DEMO table: " + len + " rows found.");
+    for (var i=0; i<len; i++){//顯示查詢結果      	
+       showMessage("Row[" + i + "][ID]:" + results.rows.item(i).id + " [Data]:" + results.rows.item(i).data + " [Time]:" + results.rows.item(i).time);
+    }
+    totalRowsNum = len;
+  }  
+	function addRowToTable(){//加入記錄到demo表中
+		if(webDB != null)
+			webDB.transaction(addRowToTableSql, errorCB, successCB); 		
+	}
+	function addRowToTableSql(tx){//加入記錄到demo表語法
+		var addData = document.getElementById('addName');
+		var id = totalRowsNum + 1;//將目前表的ID+1作為新筆紀錄的ID
+		tx.executeSql('INSERT INTO webdemo (id,data,time) VALUES (' + id + ',"' + addData.value + '" ,"' + nowDate.getTime() + '")');   
+	}
+	function editRowFromTable(){//編輯紀錄
+		if(webDB != null)
+			webDB.transaction(editRowFromTableSql, errorCB, successCB); 		
+	}
+	function editRowFromTableSql(tx){//編輯紀錄語法
+		var id = document.getElementById('oldId').value;
+		var newData = document.getElementById('newName').value;
+		var sql =  'UPDATE webdemo SET data="' + newData + '" WHERE id=' + id;
+		tx.executeSql(sql);   
+	}
+	function delRowFromTable(){//刪除紀錄
+		if(webDB != null)
+			webDB.transaction(delRowFromTableSql, errorCB, successCB); 		
+		else
+			alert("webDB is null");
+	}
+	function delRowFromTableSql(tx){//刪除記錄語法
+		var id = document.getElementById('delId').value;		
+		var sql =  'DELETE FROM webdemo WHERE id=' + id;
+		tx.executeSql(sql);
+	}
+	function errorSQLCB(err) {//查詢SQL語法失敗
+ 		var msg = "[" + err.code + "]:" + err.message;		
+  	alert(msg);
+  }
+ 	function errorCB(tx, err) {//執行SQL語法失敗
+ 		var msg = "[" + err.code + "]:" + err.message;		
+  	alert(msg);
+  }
+ 	function successCB() {//執行成功
+    alert("SQL執行完成");
+  }
+  function cleanMessage(){//清除顯示訊息
+		var log = document.getElementById('log');
+    if(log != null)
+			log.innerHTML = "";
+	}
+	/*----------------------------------------------
+	Local Storage
+	----------------------------------------------*/
+	function getDemokey(keyName){//取得demo key的值		
+		var value = storage.getItem(keyName);		
+		return value;		
+	}	
+	function setDemokey(key,value){//設定demo key		
+		storage.setItem(key,value);
+		alert("set demo key:" + getDemokey(key));
+	}
+	function showDemoKey(){//顯示demo key
+		alert(getDemokey('demo'));
+	}
+	function removeDemoKey(key){//移除demo key
+		storage.removeItem(key);
+		if(getDemokey(key) == null)
+			alert("[" + key + "]:is removed.");
+	}
+	function clearAllLocalStorage(){//清除local storage全部資料
+		storage.clear();
+		alert("remove all.");
+	}
+	/*----------------------------------------------
+	Util
+	----------------------------------------------*/
+	//顯示訊息
+	function showMessage(_msg){
+		var log = document.getElementById('log');
+    if(log != null)
+		log.innerHTML +=  _msg + '<br />';
+	}
+	//顯示通知
+	function showAlert(msg) {       
+	 	 navigator.notification.alert(            
+	 	 msg,  // 訊息             
+	 	 alertDismissed,// 呼叫函式            
+	 	 '訊息',// 標題            
+	 	 '確定'// 按鈕名稱        
+	 	 );    
+	}
+	//使用者點擊關閉訊息
+	function alertDismissed() {        
+		console.log("alertDismissed");
+	}	
+</script>
+<body>
+	<div align="center">
+		<Button onClick="createTable();">建立Demo Table</Button>		
+		<Button onClick="showDemoData();">顯示全部資料</Button><br />	
+		<p>新增</p>
+		<input type="text" id="addName" name="addName" size="10">
+		<Button onClick="addRowToTable();">新增資料</Button><br />	
+		<p>更新</p>
+		ID:<input type="text" id="oldId" name="oldId" size="3"> 
+		Data:<input type="text" id="newName" name="newName" size="10"><br />
+		<Button onClick="editRowFromTable();">更新資料</Button><br />		
+		<p>刪除</p>
+		ID:<input type="text" id="delId" name="delId" size="10">
+		<Button onClick="delRowFromTable();">刪除資料</Button><br />	
+	</div>
+	<div align="center">
+		<p>Local Storage</p>
+		<Button onClick='setDemokey("demo","demo value");'>建立DemoLocalKey</Button>		
+		<Button onClick='showDemoKey();'>顯示Demo key</Button><br />	
+		<Button onClick='removeDemoKey("demo");'>移除Demo key</Button>
+		<Button onClick="clearAllLocalStorage();">清除全部資料</Button><br />	
+	</div>
+	<div id="log" width="<script>window.innerWidth</script>"></div>
+</body>
+</html>
